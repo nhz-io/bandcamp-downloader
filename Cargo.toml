@@ -1,0 +1,42 @@
+[package]
+name = "bcdl"
+version = "2.0.2"
+edition = "2021"
+description = "Download and keep a Bandcamp collection"
+
+[dependencies]
+futures = "0.3.31"
+# rustls rather than the system tls, so a released binary does not depend on
+# whichever openssl the machine it lands on happens to have
+reqwest = { version = "0.12.8", default-features = false, features = ["cookies", "json", "stream", "rustls-tls", "http2", "charset"] }
+select = "0.6.0"
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.132"
+tokio = { version = "1.40.0", features = ["full"] }
+bytes = "1.8.0"
+url = "2.5.2"
+clap = { version = "4.5.20", features = ["derive", "env"] }
+indicatif = "0.17.8"
+# colour that turns itself off when the output is not a terminal
+console = "0.15"
+chrono = { version = "0.4.38", features = ["serde"] }
+# Reading per-track CRCs out of an archive is what makes a fingerprint survive repackaging
+zip = "2.2"
+sha2 = "0.10"
+# Browsers keep their cookies in sqlite, and chromium encrypts the values
+# bundled compiles sqlite in, since windows has no system one to link against
+rusqlite = { version = "0.32", features = ["bundled"] }
+aes = "0.8"
+cbc = { version = "0.1", features = ["block-padding", "alloc"] }
+pbkdf2 = "0.12"
+hmac = "0.12"
+sha1 = "0.10"
+
+[dev-dependencies]
+# test-util lets the retry tests skip their backoff instead of really sleeping
+tokio = { version = "1.40.0", features = ["full", "test-util"] }
+
+[profile.release]
+opt-level = "z"  # Optimize for size
+lto = true       # Enable link-time optimization
+codegen-units = 1  # Fewer code generation units can help reduce size
